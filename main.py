@@ -24,25 +24,18 @@ if place:
             figure = px.bar(x=dates, y=temperatures, labels={"x": "Date", "y": "Temperature, C"})
             st.plotly_chart(figure)
 
-        images = {
-            "clear": "images/clear.png",
-            "clouds": "images/clouds.png",
-            "rain": "images/rain.png",
-            "snow": "images/snow.png",
-        }
+        if option == "Sky":
+            images = {"Clear": "images/clear.png", "Clouds": "images/clouds.png",
+                      "Rain": "images/rain.png", "Snow": "images/snow.png"}
 
-        dates = [dict["dt_txt"] for dict in filtered_data]
-        sky_conditions = [dict["weather"][0]["main"] for dict in filtered_data]
+            dates = [dict["dt_txt"] for dict in filtered_data]
+            sky_conditions = [dict["weather"][0]["main"] for dict in filtered_data]
 
-        # Optional debug
-        # st.write("Sky conditions:", sky_conditions)
-
-        for i in range(0, len(sky_conditions), 5):
-            cols = st.columns(5)
-            for col, date, condition in zip(cols, dates[i:i + 5], sky_conditions[i:i + 5]):
-                image_src = images.get(condition.lower(), "images/clear.png")
-                col.image(image_src, caption=date, width=100)
-
+            for i in range(0, len(sky_conditions), 5):
+                cols = st.columns(5)
+                for col, date, condition in zip(cols, dates[i:i + 5], sky_conditions[i:i + 5]):
+                    image_src = images.get(condition, "images/clear.png")
+                    col.image(image_src, caption=date, width=100)
 
     except KeyError:
         st.warning(":orange[Please enter an existing place]", icon="⚠️")
