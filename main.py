@@ -1,6 +1,7 @@
 import streamlit as st
 import plotly.express as px
 from backend import get_data
+import datetime
 
 # Add title, text input, slide, selectbox and subheader
 st.title("Weather Forecast for the Next Days")
@@ -20,15 +21,21 @@ if place:
             temperatures = [dict["main"]["temp"] - 273.15 for dict in filtered_data]
             dates = [dict["dt_txt"] for dict in filtered_data]
             # Create a temperature plot
-            figure = px.line(x=dates, y=temperatures, labels={"x": "Date", "y": "Temperatures (C)"})
+            figure = px.bar(x=dates, y=temperatures, labels={"x": "Date", "y": "Temperature, C"})
             st.plotly_chart(figure)
 
         if option == "Sky":
-            images = {"Clear":"images/clear.png","Clouds":"images/cloud.png",
-                      "Rain":"images/rain.png","Snow":"images/snow.png"}
+            images = {"Clear": "images/clear.png", "Clouds": "images/clouds.png",
+                      "Rain": "images/rain.png", "Snow": "images/snow.png"}
+
+            dates = [dict["dt_txt"] for dict in filtered_data]
             sky_conditions = [dict["weather"][0]["main"] for dict in filtered_data]
-            image_paths = [images[condition] for condition in sky_conditions]
-            st.image(image_paths, width=115)
-    except:
-        if KeyError:
-            st.markdown(":red-background[Please add an existing place]")
+
+            for i in range(0, len(sky_conditions), 5):
+                cols = st.columns(5)
+                for col, date, condition in zip(cols, dates[i:i + 5], sky_conditions[i:i + 5]):
+                    image_src = images.get(condition, "images/clear.png")
+                    col.image(image_src, caption=date, width=100)
+
+    except KeyError:
+        st.warning(":orange[Please enter an existing place]", icon="⚠️")
